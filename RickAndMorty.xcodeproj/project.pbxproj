@@ -78,10 +78,6 @@
 			isa = PBXGroup;
 			children = (
 				5686EA252B03A78500450725 /* Core */,
-				5686EA262B03A7A700450725 /* RMCharacterViewController.swift */,
-				5686EA282B03A7BA00450725 /* RMLocationViewController.swift */,
-				5686EA2A2B03A7EE00450725 /* RMEpisodeViewController.swift */,
-				5686EA2C2B03A81100450725 /* RMSettingsViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -135,6 +131,10 @@
 		5686EA252B03A78500450725 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				5686EA262B03A7A700450725 /* RMCharacterViewController.swift */,
+				5686EA2A2B03A7EE00450725 /* RMEpisodeViewController.swift */,
+				5686EA282B03A7BA00450725 /* RMLocationViewController.swift */,
+				5686EA2C2B03A81100450725 /* RMSettingsViewController.swift */,
 				5686EA0E2B03A16100450725 /* RMTabBarController.swift */,
 			);
 			path = Core;
