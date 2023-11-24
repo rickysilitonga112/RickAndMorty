@@ -9,20 +9,23 @@ import Foundation
 
 /// Primary API Service object to get Rick and Morty data
 final class RMService {
-    
-    
     /// Shared singleton instance
     static let shared = RMService()
     
     
-    /// Personalized constructor
+    /// Privatized constructor
     private init() {}
     
     /// Send Rick and Morty API Call
     /// - Parameters:
     ///   - request: Request Instance
+    ///   - type: The type of object that we expect to get back
     ///   - completion: Callback with data or error
-    public func execute(_ request: RMRequest, completion: @escaping () -> Void) {
+    public func execute<T: Codable>(
+        _ request: RMRequest,
+        expecting type: T.Type,
+        completion: @escaping (Result<T, Error>) -> Void
+    ) {
         
     }
 }
