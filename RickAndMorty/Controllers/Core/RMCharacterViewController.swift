@@ -19,7 +19,7 @@ final class RMCharacterViewController: UIViewController {
         
         let request = RMRequest(
             endpoint: .character, 
-            pathComponents: ["1"],
+            pathComponents: [],
             queryParameters: [
                 URLQueryItem(name: "name", value: "rick"),
                 URLQueryItem(name: "status", value: "alive")
@@ -27,6 +27,17 @@ final class RMCharacterViewController: UIViewController {
         )
         
         print(request.url)
+        
+        RMService.shared.execute(.listCharactersRequests, expecting: RMGetAllCharacterResponse.self) { result in
+            switch result {
+            case .success(let model):
+                print("DEBUG - Total info count: \(model.info.count)")
+                print("DEBUG - Total info pages: \(model.info.pages)")
+                print("DEBUG - Page results count: \(model.results.count)")
+            case .failure(let error):
+                print(String(describing: error))
+            }
+        }
         
     }
 
