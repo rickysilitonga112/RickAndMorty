@@ -12,5 +12,4 @@ final class CharacterListViewViewModel {
     
     
     
-    
 }
