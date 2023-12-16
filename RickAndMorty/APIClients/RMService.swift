@@ -12,7 +12,6 @@ final class RMService {
     /// Shared singleton instance
     static let shared = RMService()
     
-    
     /// Privatized constructor
     private init() {}
     
@@ -26,11 +25,8 @@ final class RMService {
     ///   - request: Request Instance
     ///   - type: The type of object that we expect to get back
     ///   - completion: Callback with data or error
-    public func execute<T: Codable>(
-        _ request: RMRequest,
-        expecting type: T.Type,
-        completion: @escaping (Result<T, Error>) -> Void
-    ) {
+    public func execute<T: Codable>(_ request: RMRequest, expecting type: T.Type, completion: @escaping (Result<T, Error>) -> Void) {
+        
         guard let urlRequest = self.request(from: request) else {
             completion(.failure(RMServiceError.failedToCreateRequest))
             return
@@ -41,14 +37,6 @@ final class RMService {
                 completion(.failure(error ?? RMServiceError.failedToGetData))
                 return
             }
-            
-//            // Serialize the json object
-//            do {
-//                let json = try JSONSerialization.jsonObject(with: data)
-//                print(String(describing: json))
-//            } catch {
-//                completion(.failure(error))
-//            }
             
             // Decode response
             do {
@@ -65,7 +53,7 @@ final class RMService {
     // MARK: - PRIVATE
     
     private func request(from rmRequest: RMRequest) -> URLRequest? {
-        guard let url = rmRequest.url else { return nil}
+        guard let url = rmRequest.url else { return nil }
         
         var request = URLRequest(url: url)
         request.httpMethod = rmRequest.httpMethod

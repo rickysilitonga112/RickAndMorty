@@ -25,7 +25,7 @@ final class RMRequest {
     /// Query arguments for API, if any
     private let queryParameters: [URLQueryItem]
     
-    /// Constructed url for the api request in string format
+    /// Constructed url string for the api request in string format
     public var urlString: String {
         var string = Constants.baseUrl
         string += "/"
@@ -39,6 +39,8 @@ final class RMRequest {
         
         if !queryParameters.isEmpty {
             string += "?"
+            
+            // compact map used to filter out the nil value
             let argumentString = queryParameters.compactMap({
                 guard let value = $0.value else { return nil }
                 return "\($0.name)=\(value)"
@@ -55,8 +57,7 @@ final class RMRequest {
         return URL(string: urlString)
     }
     
-    // MARK: - PUBLIC
-    
+    // MARK: - PUBLIC Init
     public let httpMethod = "GET"
     
     /// Constructed request
@@ -64,11 +65,7 @@ final class RMRequest {
     ///   - endpoint: Target endopoint
     ///   - pathComponents: Collection of path components
     ///   - queryParameters: Collection of query parameters
-    public init(
-        endpoint: RMEndpoint,
-        pathComponents: [String] = [],
-        queryParameters: [URLQueryItem] = []
-    ) {
+    public init(endpoint: RMEndpoint, pathComponents: [String] = [], queryParameters: [URLQueryItem] = []) {
         self.endpoint = endpoint
         self.pathComponents = pathComponents
         self.queryParameters = queryParameters
@@ -77,5 +74,8 @@ final class RMRequest {
 
 
 extension RMRequest {
+    // to improve readablity of the code
     static let listCharactersRequests = RMRequest(endpoint: .character)
+    
+    // create for all request for example get locations
 }
