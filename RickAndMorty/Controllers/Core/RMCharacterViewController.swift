@@ -9,16 +9,32 @@ import UIKit
 
 /// Controller to show and search character
 final class RMCharacterViewController: UIViewController {
-
+    let characterListView = RMCharacterListView()
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         view.backgroundColor = .systemBackground
         title = "Characters"
         
+        self.setupView()
+    }
+
+    
+    private func setupView() {
+        view.addSubview(characterListView)
+        NSLayoutConstraint.activate([
+            characterListView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            characterListView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            characterListView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
+            characterListView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+        ])
+        
+        // for testing
         // create a request object
         let request = RMRequest(
-            endpoint: .character, 
+            endpoint: .character,
             pathComponents: [],
             queryParameters: [
                 URLQueryItem(name: "name", value: "rick"),
@@ -27,19 +43,5 @@ final class RMCharacterViewController: UIViewController {
         )
         
         print("Debug: URL: \(String(describing: request.url))")
-        
-        // execute the service with request
-        RMService.shared.execute(.listCharactersRequests, expecting: RMGetAllCharacterResponse.self) { result in
-            switch result {
-            case .success(let model):
-                print("DEBUG - Total info count: \(model.info.count)")
-                print("DEBUG - Total info pages: \(model.info.pages)")
-                print("DEBUG - Page results count: \(model.results.count)")
-            case .failure(let error):
-                print(String(describing: error))
-            }
-        }
-        
     }
-
 }
