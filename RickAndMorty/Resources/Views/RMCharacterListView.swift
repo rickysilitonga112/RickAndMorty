@@ -7,17 +7,28 @@
 
 import UIKit
 
+protocol RMCharacterListViewDelegate: AnyObject {
+    func rmCharacterListView(
+        characterListView: RMCharacterListView,
+        didSelectCharacter character: RMCharacter
+    )
+}
+
 ///Hancle the spinner, character list view etc
 final class RMCharacterListView: UIView {
     private let viewModel = RMCharacterListViewViewModel()
     
+    public weak var delegate: RMCharacterListViewDelegate?
+    
+    /// spinner view
     private let spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView(style: .large)
         spinner.hidesWhenStopped = true
         spinner.translatesAutoresizingMaskIntoConstraints = false
         return spinner
     }()
-    
+     
+    /// collection view
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -29,12 +40,23 @@ final class RMCharacterListView: UIView {
         collectionView.alpha = 0
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
-        collectionView.register(RMCharacterCollectionViewCell.self, forCellWithReuseIdentifier: RMCharacterCollectionViewCell.cellIdentifier)
+        // register the collection view cell that used in RMCharacterListView
+        collectionView.register(RMCharacterCollectionViewCell.self,
+                                forCellWithReuseIdentifier: RMCharacterCollectionViewCell.cellIdentifier)
+        
+        // register the loading spinner when load data in footer that used in RMCharacterListView
+        collectionView.register(RMFooterLoadingCollectionReusableView.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+                                withReuseIdentifier: RMFooterLoadingCollectionReusableView.identifier)
+        
         return collectionView
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        viewModel.delegate = self
+        
         translatesAutoresizingMaskIntoConstraints = false
         addSubViews(spinner, collectionView)
         addConstraints()
@@ -66,14 +88,21 @@ final class RMCharacterListView: UIView {
     private func setUpCollectionView() {
         collectionView.dataSource = viewModel
         collectionView.delegate = viewModel
+    }
+}
+
+extension RMCharacterListView: RMCharacterListViewViewModelDelegate {
+    func didSelectCharacter(_ character: RMCharacter) {
+        delegate?.rmCharacterListView(characterListView: self, didSelectCharacter: character)
+    }
+    
+    func didLoadInitialCharacters() {
+        collectionView.reloadData()
+        spinner.stopAnimating()
+        collectionView.isHidden = false
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            self.spinner.stopAnimating()
-            self.collectionView.isHidden = false
-            
-            UIView.animate(withDuration: 0.4) {
-                self.collectionView.alpha = 1
-            }
+        UIView.animate(withDuration: 0.4) {
+            self.collectionView.alpha = 1
         }
     }
 }

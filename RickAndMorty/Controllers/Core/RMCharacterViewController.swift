@@ -18,6 +18,9 @@ final class RMCharacterViewController: UIViewController {
         view.backgroundColor = .systemBackground
         title = "Characters"
         
+        // set the delegate
+        characterListView.delegate = self
+        
         self.setupView()
     }
 
@@ -43,5 +46,16 @@ final class RMCharacterViewController: UIViewController {
         )
         
         print("Debug: URL: \(String(describing: request.url))")
+    }
+}
+
+extension RMCharacterViewController: RMCharacterListViewDelegate {
+    func rmCharacterListView(characterListView: RMCharacterListView, didSelectCharacter character: RMCharacter) {
+        // goto detail view controller
+        let viewModel = RMCharacterDetailViewViewModel(character: character)
+        let detailVC = RMCharacterDetailViewController(viewModel: viewModel)
+    
+        detailVC.navigationItem.largeTitleDisplayMode = .never
+        navigationController?.pushViewController(detailVC, animated: true)
     }
 }
