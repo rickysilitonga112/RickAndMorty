@@ -50,7 +50,7 @@ final class RMCharacterViewController: UIViewController {
 }
 
 extension RMCharacterViewController: RMCharacterListViewDelegate {
-    func rmCharacterListView(characterListView: RMCharacterListView, didSelectCharacter character: RMCharacter) {
+    func rmCharacterListView(_ characterListView: RMCharacterListView, didSelectCharacter character: RMCharacter) {
         // goto detail view controller
         let viewModel = RMCharacterDetailViewViewModel(character: character)
         let detailVC = RMCharacterDetailViewController(viewModel: viewModel)

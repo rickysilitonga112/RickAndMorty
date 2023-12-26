@@ -40,7 +40,7 @@ final class RMCharacterCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.backgroundColor = .secondarySystemBackground
-        contentView.addSubViews(imageView, nameLabel, statusLabel)
+        contentView.addSubviews(imageView, nameLabel, statusLabel)
         
         self.addConstraints()
         setupLayer()

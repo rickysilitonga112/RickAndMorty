@@ -37,7 +37,7 @@ final class RMCharacterListViewViewModel: NSObject {
     public var apiInfo: RMGetAllCharacterResponse.Info? = nil
     
     /// Fetch initial set of characters (20 characters)
-    func fetchCharacter() {
+    func fetchCharacters() {
         // execute the service with request
         RMService.shared.execute(.listCharactersRequests, expecting: RMGetAllCharacterResponse.self) { [weak self] result in
             switch result {
