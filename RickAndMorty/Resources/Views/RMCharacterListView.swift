@@ -58,7 +58,7 @@ final class RMCharacterListView: UIView {
         viewModel.delegate = self
         
         translatesAutoresizingMaskIntoConstraints = false
-        addSubviews(spinner, collectionView)
+        addSubviews(collectionView, spinner)
         addConstraints()
         spinner.startAnimating()
         viewModel.fetchCharacters()
@@ -103,6 +103,12 @@ extension RMCharacterListView: RMCharacterListViewViewModelDelegate {
         
         UIView.animate(withDuration: 0.4) {
             self.collectionView.alpha = 1
+        }
+    }
+    
+    func didLoadMoreCharacters(with newIndexPaths: [IndexPath]) {
+        collectionView.performBatchUpdates {
+            self.collectionView.insertItems(at: newIndexPaths)
         }
     }
 }

@@ -70,6 +70,47 @@ final class RMRequest {
         self.pathComponents = pathComponents
         self.queryParameters = queryParameters
     }
+    
+    convenience init?(url: URL) {
+        let string = url.absoluteString
+        if !string.contains(Constants.baseUrl) {
+            return nil
+        }
+        
+        // base url: "https://rickandmortyapi.com/api"
+        let trimmed = string.replacingOccurrences(of: Constants.baseUrl + "/", with: "")
+        if trimmed.contains("/") {
+            let components = trimmed.components(separatedBy: "/")
+            if !components.isEmpty {
+                if let rmEndpoint = RMEndpoint(rawValue: components[0]) {
+                    self.init(endpoint: rmEndpoint)
+                    return
+                }
+            }
+            
+        } else if trimmed.contains("?") {
+            let components = trimmed.components(separatedBy: "?")
+            if !components.isEmpty, components.count >= 2 {
+//                print("RMRequest - PathComponennts: \(components)")
+                // RESULT of PRINT: RMRequest - PathComponennts: ["character", "page=2"]
+                let endpointString = components[0]
+                let queryItemsString = components[1]
+                
+                let questyItems: [URLQueryItem] = queryItemsString.components(separatedBy: "&").compactMap({
+                    guard $0.contains("=") else { return nil }
+                    let parts = $0.components(separatedBy: "=")
+                    return URLQueryItem(name: parts[0], value: parts[1])
+                })
+                
+                // create endpoint
+                if let rmEndpoint = RMEndpoint(rawValue: endpointString) {
+                    self.init(endpoint: rmEndpoint, queryParameters: questyItems)
+                    return 
+                }
+            }
+        }
+        return nil
+    }
 }
 
 
