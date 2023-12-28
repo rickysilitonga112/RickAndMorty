@@ -79,11 +79,21 @@ final class RMRequest {
         
         // base url: "https://rickandmortyapi.com/api"
         let trimmed = string.replacingOccurrences(of: Constants.baseUrl + "/", with: "")
+        
         if trimmed.contains("/") {
             let components = trimmed.components(separatedBy: "/")
             if !components.isEmpty {
-                if let rmEndpoint = RMEndpoint(rawValue: components[0]) {
-                    self.init(endpoint: rmEndpoint)
+//
+                let endpointString = components[0] //endpoint
+                var pathComponents: [String] = []
+                
+                if components.count > 1 {
+                    pathComponents = components
+                    pathComponents.removeFirst() // remove the endpoint
+                }
+                
+                if let rmEndpoint = RMEndpoint(rawValue: endpointString) {
+                    self.init(endpoint: rmEndpoint, pathComponents: pathComponents)
                     return
                 }
             }
