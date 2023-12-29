@@ -189,6 +189,8 @@
 				5686EA1F2B03A5E400450725 /* Models */,
 				5686EA1E2B03A5D300450725 /* Controllers */,
 				5686EA242B03A61B00450725 /* Resources */,
+				564BC6832B2D4F8E002713CE /* Views */,
+				564BC6842B2D4F9C002713CE /* ViewModels */,
 				5686EA182B03A16200450725 /* Info.plist */,
 			);
 			path = RickAndMorty;
@@ -237,8 +239,6 @@
 				5686EA0C2B03A16100450725 /* SceneDelegate.swift */,
 				5686EA132B03A16200450725 /* Assets.xcassets */,
 				5686EA152B03A16200450725 /* LaunchScreen.storyboard */,
-				564BC6832B2D4F8E002713CE /* Views */,
-				564BC6842B2D4F9C002713CE /* ViewModels */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
