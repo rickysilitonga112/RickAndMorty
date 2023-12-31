@@ -8,10 +8,11 @@
 import UIKit
 
 final class RMEpisodeDetailViewController: UIViewController {
-    private let url: URL?
+    private let viewModel: RMEpisodeDetailViewViewModel
     
+    // MARK: - init
     init(url: URL?) {
-        self.url = url
+        self.viewModel = .init(endpointUrl: url)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -22,9 +23,6 @@ final class RMEpisodeDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        
-        if let url = url {
-            print("URL: \(url)")
-        }
+        title = "Episode"
     }
 }

@@ -61,6 +61,7 @@ final class RMCharacterEpisodeCollectionViewCellViewModel {
                 switch result {
                 case .success(let model):
                     DispatchQueue.main.async {
+//                        print("Requesting from RMCharacterEpisodeCollectionViewCellViewModel..")
                         self?.episode = model
                     }
                 case .failure(let error):
