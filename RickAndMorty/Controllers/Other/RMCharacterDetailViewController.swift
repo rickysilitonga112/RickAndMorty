@@ -82,14 +82,15 @@ extension RMCharacterDetailViewController: UICollectionViewDelegate, UICollectio
         let sectionType = viewModel.sections[indexPath.section]
         
         switch sectionType {
-        case .photo:
+        case .photo(let viewModel):
             guard let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: RMCharacterPhotoCollectionViewCell.identifier,
                 for: indexPath
             ) as? RMCharacterPhotoCollectionViewCell else {
                 fatalError("Failed to cast cell to RMCharacterPhotoCollectionViewCell")
             }
-            cell.backgroundColor = .systemPink
+            cell.configure(with: viewModel)
+            
             return cell
         case .information(let viewModels):
             guard let cell = collectionView.dequeueReusableCell(
@@ -98,8 +99,8 @@ extension RMCharacterDetailViewController: UICollectionViewDelegate, UICollectio
             ) as? RMCharacterInfoCollectionViewCell else {
                 fatalError("Failed to cast cell to RMCharacterInfoCollectionViewCell")
             }
+            cell.configure(with: viewModels[indexPath.row])
             
-            cell.backgroundColor = .systemBlue
             return cell
         case .episodes(let viewModels):
             guard let cell = collectionView.dequeueReusableCell(
@@ -108,9 +109,25 @@ extension RMCharacterDetailViewController: UICollectionViewDelegate, UICollectio
             ) as? RMCharacterEpisodeCollectionViewCell else {
                 fatalError("Failed to cast cell to RMCharacterEpisodeCollectionViewCell")
             }
+            cell.configure(with: viewModels[indexPath.row])
             
-            cell.backgroundColor = .systemRed
             return cell
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let sectionType = viewModel.sections[indexPath.section]
+        
+        switch sectionType {
+        case .photo,
+            .information:
+            break
+        case .episodes:
+            let episodes = viewModel.episodes
+            let selectedEpisode = episodes[indexPath.row]
+            let vc = RMEpisodeDetailViewController(url: URL(string: selectedEpisode))
+            
+            navigationController?.pushViewController(vc, animated: true)
         }
     }
 }
