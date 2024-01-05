@@ -84,7 +84,7 @@ extension RMCharacterDetailViewController: UICollectionViewDelegate, UICollectio
         switch sectionType {
         case .photo(let viewModel):
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: RMCharacterPhotoCollectionViewCell.identifier,
+                withReuseIdentifier: RMCharacterPhotoCollectionViewCell.cellIdentifier,
                 for: indexPath
             ) as? RMCharacterPhotoCollectionViewCell else {
                 fatalError("Failed to cast cell to RMCharacterPhotoCollectionViewCell")
@@ -94,7 +94,7 @@ extension RMCharacterDetailViewController: UICollectionViewDelegate, UICollectio
             return cell
         case .information(let viewModels):
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: RMCharacterInfoCollectionViewCell.identifier,
+                withReuseIdentifier: RMCharacterInfoCollectionViewCell.cellIdentifier,
                 for: indexPath
             ) as? RMCharacterInfoCollectionViewCell else {
                 fatalError("Failed to cast cell to RMCharacterInfoCollectionViewCell")
@@ -104,7 +104,7 @@ extension RMCharacterDetailViewController: UICollectionViewDelegate, UICollectio
             return cell
         case .episodes(let viewModels):
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: RMCharacterEpisodeCollectionViewCell.identifier,
+                withReuseIdentifier: RMCharacterEpisodeCollectionViewCell.cellIdentifier,
                 for: indexPath
             ) as? RMCharacterEpisodeCollectionViewCell else {
                 fatalError("Failed to cast cell to RMCharacterEpisodeCollectionViewCell")

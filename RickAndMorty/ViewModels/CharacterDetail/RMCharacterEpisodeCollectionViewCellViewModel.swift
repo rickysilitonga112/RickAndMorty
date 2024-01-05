@@ -14,12 +14,13 @@ protocol RMEpisodeDataRender {
     var episode: String { get }
 }
 
-final class RMCharacterEpisodeCollectionViewCellViewModel {
+final class RMCharacterEpisodeCollectionViewCellViewModel: Hashable, Equatable {
     private let episodeDataUrl: URL?
     public let borderColor: UIColor
     
     private var isFetching = false
     private var dataBlock: ((RMEpisodeDataRender) -> Void)?
+    
     private var episode: RMEpisode? {
         didSet {
             guard let model = episode else {
@@ -68,6 +69,15 @@ final class RMCharacterEpisodeCollectionViewCellViewModel {
                     print(String(describing: error))
                 }
             }
-        
     }
+    
+    // MARK: - HASH PROTOCOL STUBS
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(self.episodeDataUrl?.absoluteString ?? "")
+    }
+    
+    static func == (lhs: RMCharacterEpisodeCollectionViewCellViewModel, rhs: RMCharacterEpisodeCollectionViewCellViewModel) -> Bool {
+        return lhs.hashValue == rhs.hashValue
+    }
+    
 }

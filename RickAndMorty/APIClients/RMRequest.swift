@@ -127,6 +127,7 @@ final class RMRequest {
 extension RMRequest {
     // to improve readablity of the code
     static let listCharactersRequests = RMRequest(endpoint: .character)
+    static let listEpisodeRequests = RMRequest(endpoint: .episode)
     
     // create for all request for example get locations
 }

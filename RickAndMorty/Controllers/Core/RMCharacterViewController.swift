@@ -33,19 +33,6 @@ final class RMCharacterViewController: UIViewController {
             characterListView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
             characterListView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
-        
-        // for testing
-        // create a request object
-        let request = RMRequest(
-            endpoint: .character,
-            pathComponents: [],
-            queryParameters: [
-                URLQueryItem(name: "name", value: "rick"),
-                URLQueryItem(name: "status", value: nil)
-            ]
-        )
-        
-        print("Debug: URL: \(String(describing: request.url))")
     }
 }
 

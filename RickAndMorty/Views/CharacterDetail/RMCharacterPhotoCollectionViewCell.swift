@@ -8,7 +8,7 @@
 import UIKit
 
 class RMCharacterPhotoCollectionViewCell: UICollectionViewCell {
-    static let identifier = "RMCharacterPhotoCollectionViewCell"
+    static let cellIdentifier = "RMCharacterPhotoCollectionViewCell"
     
     private let imageView: UIImageView = {
         let imageView = UIImageView()

@@ -23,6 +23,6 @@ final class RMEpisodeDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        title = "Episode"
+        title = "Episode Detail"
     }
 }

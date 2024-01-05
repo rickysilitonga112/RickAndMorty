@@ -53,6 +53,8 @@ final class RMCharacterDetailViewViewModel {
     }
     
     // MARK: - SECTION LAYOUT
+    // setup layout for every collection section on the character detail view
+    
     public func createPhotoSectionLayout() -> NSCollectionLayoutSection {
         let item = NSCollectionLayoutItem(
             layoutSize: NSCollectionLayoutSize(
@@ -79,6 +81,7 @@ final class RMCharacterDetailViewViewModel {
         
         return section
     }
+    
     public func createInfoSectionLayout() -> NSCollectionLayoutSection {
         let item = NSCollectionLayoutItem(
             layoutSize: NSCollectionLayoutSize(
