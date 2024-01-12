@@ -76,7 +76,7 @@ final class RMEpisodeListViewViewModel: NSObject {
     
     /// Paginate if additional characters are needed
     public func fetchAdditionalEpisode(url: URL) {
-        print("DEBUG: isLoadingMoreEpisode: \(isLoadingMoreEpisode)")
+//        print("DEBUG: isLoadingMoreEpisode: \(isLoadingMoreEpisode)")
         guard !isLoadingMoreEpisode else {
             return
         }
@@ -206,7 +206,7 @@ extension RMEpisodeListViewViewModel: UIScrollViewDelegate {
         }
         
         if offset >= (totalContentHeight - totalScrollViewFixedHeight - 120) {
-            print("Load more Episode with url : \(url)")
+//            print("Load more Episode with url : \(url)")
             fetchAdditionalEpisode(url: url)
         }
     }

@@ -36,8 +36,8 @@ extension RMEpisodeViewController: RMEpisodeListViewDelegate {
     func rmEpisodeListView(_ episodeListView: RMEpisodeListView, didSelectEpisode episode: RMEpisode) {
         // goto detail view controller if episode cell is tapped
         let detailVC = RMEpisodeDetailViewController(url: URL(string: episode.url))
-        print("DEBUG: Episode selected: \(episode)")
-        print("DEBUG: Goto RMEpisodeDetailViewController with URL String: \(episode.url)")
+//        print("DEBUG: Episode selected: \(episode)")
+//        print("DEBUG: Goto RMEpisodeDetailViewController with URL String: \(episode.url)")
         detailVC.navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(detailVC, animated: true)
     }

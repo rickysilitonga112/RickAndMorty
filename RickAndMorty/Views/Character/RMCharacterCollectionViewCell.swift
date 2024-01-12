@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// a view cell for CharacterCollection
 final class RMCharacterCollectionViewCell: UICollectionViewCell {
     static let cellIdentifier = "RMCharacterCollectionViewCell"
     

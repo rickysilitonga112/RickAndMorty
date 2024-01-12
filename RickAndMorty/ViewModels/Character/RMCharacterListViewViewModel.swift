@@ -29,6 +29,7 @@ final class RMCharacterListViewViewModel: NSObject {
                     characterImageUrl: URL(string:character.image)
                 )
                 
+                // checking to avoid repeatitive view models
                 if !cellViewModels.contains(viewModel) {
                     cellViewModels.append(viewModel)
                 }
@@ -166,7 +167,6 @@ extension RMCharacterListViewViewModel: UICollectionViewDataSource, UICollection
 }
 
 // MARK: - SCROLL VIEW DELEGATE
-
 extension RMCharacterListViewViewModel: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
 //        print("Offset: \(offset)")

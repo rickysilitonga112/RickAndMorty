@@ -91,11 +91,14 @@ final class RMCharacterListView: UIView {
     }
 }
 
+// Call the function on viewController the view controller
 extension RMCharacterListView: RMCharacterListViewViewModelDelegate {
+    // push to the detail view controller
     func didSelectCharacter(_ character: RMCharacter) {
         delegate?.rmCharacterListView(self, didSelectCharacter: character)
     }
     
+    // 
     func didLoadInitialCharacters() {
         collectionView.reloadData()
         spinner.stopAnimating()
