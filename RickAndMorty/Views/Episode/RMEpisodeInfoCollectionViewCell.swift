@@ -54,9 +54,11 @@ final class RMEpisodeInfoCollectionViewCell: UICollectionViewCell {
     // MARK: - PRIVATE FUNCTION
     
     private func setupLayer() {
-        contentView.layer.shadowColor = UIColor.label.cgColor
-        contentView.layer.cornerRadius = 4
+        contentView.layer.shadowColor = UIColor.secondaryLabel.cgColor
+        contentView.layer.cornerRadius = 8
         contentView.layer.shadowOffset = CGSize(width: -4, height: 4)
+        contentView.layer.borderWidth = 1
+        contentView.layer.masksToBounds = true
         contentView.layer.shadowOpacity = 0.3
     }
     

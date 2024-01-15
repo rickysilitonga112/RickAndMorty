@@ -22,7 +22,7 @@ class RMCharacterDetailViewController: UIViewController {
             action: #selector(didTapShare)
         )
         view.addSubview(detailView)
-        print(String(describing: viewModel))
+//        print(String(describing: viewModel))
         
         addConstraints()
         
