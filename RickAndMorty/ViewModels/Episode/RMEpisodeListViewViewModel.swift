@@ -55,7 +55,7 @@ final class RMEpisodeListViewViewModel: NSObject {
     /// Fetch initial set of characters (20 characters)
     func fetchEpisodes() {
         // execute the service with request
-        RMService.shared.execute(.listEpisodeRequests, expecting: RMGetAllEpisodeResponse.self) { [weak self] result in
+        RMService.shared.execute(.listEpisodesRequests, expecting: RMGetAllEpisodeResponse.self) { [weak self] result in
             switch result {
             case .success(let responseModel):
                 let results = responseModel.results
