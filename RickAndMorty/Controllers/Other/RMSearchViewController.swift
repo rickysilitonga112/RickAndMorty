@@ -14,17 +14,17 @@ final class RMSearchViewController: UIViewController {
     struct Config {
         enum `Type` {
             case character
-            case episode
             case location
+            case episode
             
             var endpoint: RMEndpoint {
                 switch self {
                 case .character:
                     return .character
-                case .episode:
-                    return .episode
                 case .location:
                     return .location
+                case .episode:
+                    return .episode
                 }
             }
             
@@ -32,12 +32,11 @@ final class RMSearchViewController: UIViewController {
                 switch self {
                 case .character:
                     return "Search character"
-                case .episode:
-                    return "Search episode"
                 case.location:
                     return "Search location"
+                case .episode:
+                    return "Search episode"
                 }
-                
             }
         }
         let type: `Type`
@@ -63,6 +62,9 @@ final class RMSearchViewController: UIViewController {
         title = viewModel.config.type.title
         view.backgroundColor = .systemBackground
         view.addSubview(searchView)
+        
+        searchView.delegate = self
+        
         setupConstraints()
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Search",
@@ -72,9 +74,15 @@ final class RMSearchViewController: UIViewController {
         )
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        searchView.setupKeyboard()
+    }
+    
     @objc
     private func didTapExecureSearch() {
         // TODO: - search viewmodel execute search
+        viewModel.executeSearch()
     }
     
     private func setupConstraints() {
@@ -84,5 +92,25 @@ final class RMSearchViewController: UIViewController {
             searchView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
             searchView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
+    }
+}
+
+
+extension RMSearchViewController: RMSearchViewDelegate {
+    func rmSearchView(_ searchView: RMSearchView, didSelectOption option: RMSearchInputViewViewModel.DynamicOption) {
+        let vc = RMSearchOptionPickerViewController(option: option) {[weak self] selection in
+            DispatchQueue.main.async {
+                self?.viewModel.set(value: selection, for: option)
+            }
+        }
+        vc.sheetPresentationController?.detents = [.medium()]
+        vc.sheetPresentationController?.prefersGrabberVisible = true
+        present(vc, animated: true)
+    }
+    
+    func rmSearchView(_ searchView: RMSearchView, didSelectLocation location: RMLocation) {
+        let vc = RMLocationDetailViewController(location: location)
+        vc.navigationItem.largeTitleDisplayMode = .never
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
