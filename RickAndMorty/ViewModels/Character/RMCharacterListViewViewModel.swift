@@ -113,6 +113,7 @@ final class RMCharacterListViewViewModel: NSObject {
     }
 }
 
+// MARK: - CollectionView Delegate & Datasource
 extension RMCharacterListViewViewModel: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

@@ -31,8 +31,8 @@ final class RMSearchViewViewModel {
             switch result {
             case .success(let model):
                 self?.processSearchResult(model: model)
-                
-            case .failure(_):
+//                print(String(describing: model))
+            case .failure(let error):
                 self?.handleNoResult()
             }
         }
@@ -49,7 +49,7 @@ final class RMSearchViewViewModel {
                 return RMCharacterCollectionViewCellViewModel(
                     characterName: character.name,
                     characterStatus: character.status,
-                    characterImageUrl: URL(string: character.url))
+                    characterImageUrl: URL(string: character.image))
             }))
         } else if let episodeResults = model as? RMGetAllEpisodeResponse {
             resultsVM = .episodes(episodeResults.results.compactMap({ episode in
