@@ -121,7 +121,7 @@ final class RMEpisodeDetailViewViewModel {
             case .success(let dataModel):
                 self?.fetchRelatedCharacters(episode: dataModel)
             case .failure(let failure):
-                print("Filure with code: \(failure)")
+                fatalError("Filure with code: \(failure)")
             }
         }
     }

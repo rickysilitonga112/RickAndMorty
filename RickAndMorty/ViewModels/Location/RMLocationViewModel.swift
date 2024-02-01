@@ -13,7 +13,7 @@ protocol RMLocationViewModelDelegate: AnyObject {
 
 class RMLocationViewModel {
     weak var delegate: RMLocationViewModelDelegate?
-    private var locations: [RMLocation] = [] {
+    public var locations: [RMLocation] = [] {
         didSet {
             for location in locations {
                 let cellViewModel = RMLocationTableViewCellViewModel(location: location)
@@ -23,13 +23,69 @@ class RMLocationViewModel {
             }
         }
     }
-    public private(set) var cellViewModels: [RMLocationTableViewCellViewModel] = []
     private var hasMoreResults: Bool {
         return false
     }
+    private var didFinishPagination: (() -> Void)?
     private var apiInfo: RMGetAllLocationResponse.Info?
-    
+    public var isLoadingMoreLocations = false
+    public private(set) var cellViewModels: [RMLocationTableViewCellViewModel] = []
+    public var shouldShowLoadMoreIndicator: Bool {
+        return apiInfo?.next != nil
+    }
+  
+    // MARK: - Init
     init() {}
+    
+    // MARK: - Public
+    
+    public func registerDidFinishPagination(_ block: @escaping () -> Void) {
+        self.didFinishPagination = block
+    }
+    
+    public func fetchMoreLocations() {
+        guard !isLoadingMoreLocations else { return }
+        
+        guard let nextUrlString = apiInfo?.next,
+              let url = URL(string: nextUrlString) else {
+            return
+        }
+        
+        isLoadingMoreLocations = true
+        guard let request = RMRequest(url: url) else {
+            // after request set for loading more characters to flase
+            isLoadingMoreLocations = false
+            return
+        }
+        
+        // after success with create a request, execute that request
+        RMService.shared.execute(request, expecting: RMGetAllLocationResponse.self) { [weak self] result in
+            guard let strongSelf = self else { return }
+            
+            switch result {
+            case .success(let responseModel):
+                let moreResults = responseModel.results
+                strongSelf.apiInfo = responseModel.info
+//                strongSelf.cellViewModels.append(contentsOf: moreResults.compactMap({ location in
+//                    return RMLocationTableViewCellViewModel(location: location)
+//                }))
+                strongSelf.locations.append(contentsOf: moreResults.compactMap({ location in
+                    return location
+                }))
+                
+//                strongSelf.locations.append(contentsOf: moreResults)
+                DispatchQueue.main.async {
+                    strongSelf.isLoadingMoreLocations = false
+                    
+                    // notify the callback
+                    strongSelf.didFinishPagination?()
+                }
+            case .failure(let error):
+                print(String(describing: error))
+                self?.isLoadingMoreLocations = false
+            }
+        }
+    }
     
     public func location(at index: Int) -> RMLocation? {
         print("Debug: Index - \(index)")
@@ -38,7 +94,7 @@ class RMLocationViewModel {
             return nil
         }
         
-        return locations[index]
+        return self.locations[index]
     }
     
     public func fetchLocations() {

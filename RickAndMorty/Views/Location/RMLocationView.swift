@@ -11,17 +11,23 @@ protocol RMLocationViewDelegate: AnyObject {
     func rmLocationView(_ view: RMLocationView, didSelect location: RMLocation)
 }
 
-class RMLocationView: UIView {
+final class RMLocationView: UIView {
     weak var delegate: RMLocationViewDelegate?
-    
+
     private var viewModel: RMLocationViewModel? {
         didSet {
+            spinner.stopAnimating()
             tableView.reloadData()
             tableView.isHidden = false
-            spinner.stopAnimating()
+            
             UIView.animate(withDuration: 0.3) {
                 self.tableView.alpha = 1
             }
+            
+            viewModel?.registerDidFinishPagination({
+                self.tableView.tableFooterView = nil
+                self.tableView.reloadData()
+            })
         }
     }
     
@@ -79,22 +85,15 @@ class RMLocationView: UIView {
         tableView.dataSource = self
     }
     
+ 
     // MARK: - public
     public func configure(with viewModel: RMLocationViewModel) {
         self.viewModel = viewModel
     }
 }
 
-extension RMLocationView: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        
-        guard let location = viewModel?.location(at: indexPath.row) else { return }
-        
-        self.delegate?.rmLocationView(self, didSelect: location)
-    }
-}
-extension RMLocationView: UITableViewDataSource {
+// MARK: - TableView Delegate and Datasource
+extension RMLocationView: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel?.cellViewModels.count ?? 0
     }
@@ -111,5 +110,45 @@ extension RMLocationView: UITableViewDataSource {
         cell.configure(with: cellViewModel)
         
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        guard let location = viewModel?.location(at: indexPath.row) else { return }
+        
+        self.delegate?.rmLocationView(self, didSelect: location)
+    }
+}
+
+// MARK: - ScrollView Delegate
+extension RMLocationView: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard let viewModel = viewModel,
+              !viewModel.cellViewModels.isEmpty,
+              viewModel.shouldShowLoadMoreIndicator,
+              !viewModel.isLoadingMoreLocations else {
+            return
+        }
+
+        
+        let offset = scrollView.contentOffset.y
+        let totalContentHeight = scrollView.contentSize.height
+        let totalScrollViewFixedHeight = scrollView.frame.size.height
+        
+        /// this code to fix redundant fetching a more character
+        guard offset > 0 else {
+            return
+        }
+        
+        if offset >= (totalContentHeight - totalScrollViewFixedHeight - 120) {
+            self.showLoadingIndicator()
+            viewModel.fetchMoreLocations()
+        }
+    }
+    
+    private func showLoadingIndicator() {
+        let footer = RMTableLoadingFooterView(frame: CGRect(x: 0, y: 0, width: frame.size.width, height: 100))
+        tableView.tableFooterView = footer
     }
 }

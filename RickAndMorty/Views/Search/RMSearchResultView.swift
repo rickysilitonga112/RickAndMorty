@@ -8,6 +8,8 @@
 import UIKit
 
 protocol RMSearchResultViewDelegate: AnyObject {
+    func rmSearchResultView(_ resultView: RMSearchResultView, didTapCharacterAt index: Int)
+    func rmSearchResultView(_ resultView: RMSearchResultView, didTapEpisodeAt index: Int)
     func rmSearchResultView(_ resultView: RMSearchResultView, didTapLocationAt index: Int)
 }
 
@@ -20,8 +22,10 @@ final class RMSearchResultView: UIView {
         }
     }
     
-    private var locationTableViewCellViewModels: [RMLocationTableViewCellViewModel] = []
+    /// tableViewViewModels
+    private var locationViewCellViewModels: [RMLocationTableViewCellViewModel] = []
     
+    /// collectionViewViewModels
     private var collectionViewCellViewModels: [any Hashable] = []
     
     private var tableView: UITableView = {
@@ -41,7 +45,7 @@ final class RMSearchResultView: UIView {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         
         layout.scrollDirection = .vertical
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
+        layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 0, right: 10)
          
         collectionView.isHidden = true
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -86,7 +90,7 @@ final class RMSearchResultView: UIView {
         
         switch viewModel.results {
         case .characters(let viewModels):
-            print(String(describing: viewModels))
+//            print(String(describing: viewModels))
             self.collectionViewCellViewModels = viewModels
             setupCollectionView()
         case .episodes(let viewModels):
@@ -98,10 +102,10 @@ final class RMSearchResultView: UIView {
     }
     
     private func setupCollectionView() {
-        self.tableView.isHidden = true
-        self.collectionView.isHidden = false
         collectionView.delegate = self
         collectionView.dataSource = self
+        self.tableView.isHidden = true
+        self.collectionView.isHidden = false
         collectionView.reloadData()
     }
 
@@ -110,10 +114,9 @@ final class RMSearchResultView: UIView {
         tableView.dataSource = self
         tableView.isHidden = false
         collectionView.isHidden = true
-        self.locationTableViewCellViewModels = viewModels
+        self.locationViewCellViewModels = viewModels
         tableView.reloadData()
     }
-
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
@@ -139,15 +142,15 @@ final class RMSearchResultView: UIView {
 extension RMSearchResultView: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        print("Debug - TableViewCount: \(locationTableViewCellViewModels.count)")
-        return locationTableViewCellViewModels.count
+//        print("Debug - TableViewCount: \(locationViewCellViewModels.count)")
+        return locationViewCellViewModels.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: RMLocationTableViewCell.cellIdentifier, for: indexPath) as? RMLocationTableViewCell else {
             fatalError("Unable to create loacation table view cell")
         }
-        cell.configure(with: locationTableViewCellViewModels[indexPath.row])
+        cell.configure(with: locationViewCellViewModels[indexPath.row])
         return cell
     }
     
@@ -193,8 +196,16 @@ extension RMSearchResultView: UICollectionViewDataSource, UICollectionViewDelega
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
-        
         // TODO: Handle change screen
+        let currentViewModel = collectionViewCellViewModels[indexPath.row]
+        
+        if currentViewModel is RMCharacterCollectionViewCellViewModel {
+            delegate?.rmSearchResultView(self, didTapCharacterAt: indexPath.row)
+        } else {
+            delegate?.rmSearchResultView(self, didTapEpisodeAt: indexPath.row)
+        }
+        
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -218,11 +229,121 @@ extension RMSearchResultView: UICollectionViewDataSource, UICollectionViewDelega
             height: 100
         )
     }
+    
+    // for footer section if load more load more results
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        guard kind == UICollectionView.elementKindSectionFooter,
+              let footer = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: RMFooterLoadingCollectionReusableView.identifier,
+                for: indexPath
+              ) as? RMFooterLoadingCollectionReusableView else {
+            fatalError("Unsupported")
+        }
+        if let viewModel = viewModel, viewModel.shouldShowLoadMoreIndicator {
+            footer.startAnimating()
+        }
+        return footer
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
+        guard let viewModel = viewModel,
+              viewModel.shouldShowLoadMoreIndicator else {
+            return .zero
+        }
+
+        return CGSize(width: collectionView.frame.width,
+                      height: 100)
+    }
 }
 
+// MARK: - ScrollView Delegate
+extension RMSearchResultView: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if !locationViewCellViewModels.isEmpty {
+           handleLocationPagination(scrollView: scrollView)
+        } else {
+            handleCharacterOrEpisodePagination(scrollView: scrollView)
+        }
+    }
+    
+    private func handleCharacterOrEpisodePagination(scrollView: UIScrollView) {
+        guard let viewModel = viewModel,
+              !collectionViewCellViewModels.isEmpty,
+              viewModel.shouldShowLoadMoreIndicator,
+              !viewModel.isLoadingMoreResults else {
+            return
+        }
+        
+        let offset = scrollView.contentOffset.y
+        let totalContentHeight = scrollView.contentSize.height
+        let totalScrollViewFixedHeight = scrollView.frame.size.height
+        
+        /// this code to fix redundant fetching a more character
+        guard offset > 0 else {
+            return
+        }
+        
+        if offset >= (totalContentHeight - totalScrollViewFixedHeight - 120) {
+            viewModel.fetchAdditionalResults { [weak self] newResults in
+                guard let strongSelf = self else { return }
+                // insert the
+                DispatchQueue.main.async {
+                    let originalCount = strongSelf.collectionViewCellViewModels.count
+                    let newCount = newResults.count
+                    let addedCount = newCount - originalCount
+                    
+                    // Update the view model data source
+                    strongSelf.collectionViewCellViewModels = newResults
+                    
+                    if addedCount > 0 {
+                        // If there are new items added
+                        let startingIndex = originalCount
+                        let indexPathsToAdd: [IndexPath] = (startingIndex..<startingIndex + addedCount).map {
+                            IndexPath(row: $0, section: 0)
+                        }
+                        strongSelf.collectionView.insertItems(at: indexPathsToAdd)
+                    }
+                }
+            }
+        }
+    }
+    
+    private func handleLocationPagination(scrollView: UIScrollView) {
+        guard let viewModel = viewModel,
+              !locationViewCellViewModels.isEmpty,
+              viewModel.shouldShowLoadMoreIndicator,
+              !viewModel.isLoadingMoreResults else {
+            return
+        }
 
-
-extension UIDevice {
-    /// Check if current device is phone idiom
-    static let isiPhone = UIDevice.current.userInterfaceIdiom == .phone
+//        print("Condition match..")
+        
+        let offset = scrollView.contentOffset.y
+        let totalContentHeight = scrollView.contentSize.height
+        let totalScrollViewFixedHeight = scrollView.frame.size.height
+        
+        /// this code to fix redundant fetching a more character
+        guard offset > 0 else {
+            return
+        }
+        
+        if offset >= (totalContentHeight - totalScrollViewFixedHeight - 120) {
+            DispatchQueue.main.async {
+                self.showTableLoadingIndicator()
+            }
+            
+            viewModel.fetchAdditionalLocations {[weak self] newResult in
+                // refresh table
+                self?.tableView.tableFooterView = nil
+                self?.locationViewCellViewModels = newResult
+                self?.tableView.reloadData()
+            }
+        }
+    }
+    
+    private func showTableLoadingIndicator() {
+        let footer = RMTableLoadingFooterView(frame: CGRect(x: 0, y: 0, width: frame.size.width, height: 100))
+        tableView.tableFooterView = footer
+    }
 }
