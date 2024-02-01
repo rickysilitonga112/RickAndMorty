@@ -22,8 +22,20 @@ final class RMCharacterViewController: UIViewController {
         characterListView.delegate = self
         
         self.setupView()
+        addSearchButton()
     }
 
+    private func addSearchButton() {
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(didTapSearch))
+    }
+    
+    @objc
+    private func didTapSearch() {
+        let vc = RMSearchViewController(config: RMSearchViewController.Config(type: .character ))
+        vc.navigationItem.largeTitleDisplayMode = .never
+        
+        navigationController?.pushViewController(vc, animated: true)
+    }
     
     private func setupView() {
         view.addSubview(characterListView)
@@ -33,19 +45,6 @@ final class RMCharacterViewController: UIViewController {
             characterListView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
             characterListView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
-        
-        // for testing
-        // create a request object
-        let request = RMRequest(
-            endpoint: .character,
-            pathComponents: [],
-            queryParameters: [
-                URLQueryItem(name: "name", value: "rick"),
-                URLQueryItem(name: "status", value: nil)
-            ]
-        )
-        
-        print("Debug: URL: \(String(describing: request.url))")
     }
 }
 

@@ -22,7 +22,7 @@ final class RMTabBarController: UITabBarController {
         let locationsVC = RMLocationViewController()
         let settingsVC = RMSettingsViewController()
         
-//        // set the large title display mode for all of the view controller
+        // set the large title display mode for all of the view controller
         charactersVC.navigationItem.largeTitleDisplayMode = .automatic
         episodesVC.navigationItem.largeTitleDisplayMode = .automatic
         locationsVC.navigationItem.largeTitleDisplayMode = .automatic

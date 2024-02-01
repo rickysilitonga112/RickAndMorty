@@ -8,7 +8,7 @@
 import UIKit
 
 class RMCharacterInfoCollectionViewCell: UICollectionViewCell {
-    static let identifier = "RMCharacterInfoCollectionViewCell"
+    static let cellIdentifier = "RMCharacterInfoCollectionViewCell"
     
     private let valueLabel: UILabel = {
         let label =  UILabel()

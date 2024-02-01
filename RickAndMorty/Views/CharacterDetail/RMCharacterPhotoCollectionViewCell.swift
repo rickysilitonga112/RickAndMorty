@@ -8,7 +8,7 @@
 import UIKit
 
 class RMCharacterPhotoCollectionViewCell: UICollectionViewCell {
-    static let identifier = "RMCharacterPhotoCollectionViewCell"
+    static let cellIdentifier = "RMCharacterPhotoCollectionViewCell"
     
     private let imageView: UIImageView = {
         let imageView = UIImageView()
@@ -17,7 +17,7 @@ class RMCharacterPhotoCollectionViewCell: UICollectionViewCell {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.addSubview(imageView)
