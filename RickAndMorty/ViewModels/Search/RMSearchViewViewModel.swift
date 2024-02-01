@@ -31,7 +31,6 @@ final class RMSearchViewViewModel {
             switch result {
             case .success(let model):
                 self?.processSearchResult(model: model)
-//                print(String(describing: model))
             case .failure(let error):
                 self?.handleNoResult()
             }
@@ -44,6 +43,8 @@ final class RMSearchViewViewModel {
     
     private func processSearchResult(model: Codable) {
         var resultsVM: RMSearchResultType?
+        var next: String?
+        
         if let characterResults = model as? RMGetAllCharacterResponse {
             resultsVM = .characters(characterResults.results.compactMap({ character in
                 return RMCharacterCollectionViewCellViewModel(
@@ -51,23 +52,26 @@ final class RMSearchViewViewModel {
                     characterStatus: character.status,
                     characterImageUrl: URL(string: character.image))
             }))
+            next = characterResults.info.next
         } else if let episodeResults = model as? RMGetAllEpisodeResponse {
             resultsVM = .episodes(episodeResults.results.compactMap({ episode in
                 return RMCharacterEpisodeCollectionViewCellViewModel(episodeDataUrl: URL(string: episode.url))
             }))
+            
+            next = episodeResults.info.next
             
         } else if let locationResults = model as? RMGetAllLocationResponse {
             self.searchResultModel = model
             resultsVM = .locations(locationResults.results.compactMap({ location in
                 return RMLocationTableViewCellViewModel(location: location)
             }))
-        } else {
-            handleNoResult()
+            next = locationResults.info.next
         }
         
         if let results = resultsVM {
             self.searchResultModel = model
-            let vm = RMSearchResultViewModel(results: results)
+            let vm = RMSearchResultViewModel(results: results, next: next)
+//            print("Debug: next - \(String(describing: next))")
             self.searchResultHandler?(vm)
         }
     }
@@ -77,13 +81,29 @@ final class RMSearchViewViewModel {
         guard let searchModel = searchResultModel as? RMGetAllLocationResponse else {
             return nil
         }
+        
+        // TODO: - FIX INDEX OUT OF RANGE WHEN CLICK TO DETAIL IN SEARCH RESULT VIEW
+        return searchModel.results[index]
+    }
+    
+    public func characterSearchResult(at index: Int) -> RMCharacter? {
+        guard let searchModel = searchResultModel as? RMGetAllCharacterResponse else {
+            return nil
+        }
+        return searchModel.results[index]
+    }
+    
+    public func episodeSearchResult(at index: Int) -> RMEpisode? {
+        guard let searchModel = searchResultModel as? RMGetAllEpisodeResponse else {
+            return nil
+        }
         return searchModel.results[index]
     }
     
     public func set(query text: String) {
         self.searchText = text
     }
-    
+
     public func set(value: String, for option: RMSearchInputViewViewModel.DynamicOption) {
         optionMap[option] = value
         let tuple = (option, value)
@@ -91,6 +111,10 @@ final class RMSearchViewViewModel {
     }
     
     public func executeSearch() {
+        guard !searchText.trimmingCharacters(in: .whitespaces).isEmpty else {
+            return
+        }
+        
         // Build query item
         var queryParams: [URLQueryItem] = [
             URLQueryItem(name: "name", value: searchText.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed))
@@ -106,6 +130,8 @@ final class RMSearchViewViewModel {
             endpoint: config.type.endpoint,
             queryParameters: queryParams
         )
+        
+        print("Make api call with api url: \(String(describing: request.urlString))")
         
         switch config.type.endpoint {
         case .character:

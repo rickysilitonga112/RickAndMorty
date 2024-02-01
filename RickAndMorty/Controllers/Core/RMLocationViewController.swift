@@ -9,9 +9,7 @@ import UIKit
 
 /// Controller to show and search location
 final class RMLocationViewController: UIViewController, RMLocationViewDelegate, RMLocationViewModelDelegate {
-    
-    
-    private var primaryView = RMLocationView()
+   private var primaryView = RMLocationView()
     
     private let viewModel = RMLocationViewModel()
 
@@ -65,5 +63,4 @@ final class RMLocationViewController: UIViewController, RMLocationViewDelegate, 
     func didFetchInitialLocations() {
         primaryView.configure(with: viewModel)
     }
-
 }
